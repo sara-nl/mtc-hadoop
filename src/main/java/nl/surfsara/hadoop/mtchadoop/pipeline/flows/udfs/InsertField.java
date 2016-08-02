@@ -49,7 +49,7 @@ public class InsertField extends BaseOperation<Tuple> implements Function<Tuple>
     public void operate(FlowProcess flowProcess, FunctionCall<Tuple> functionCall) {
         TupleEntry args = functionCall.getArguments();
         String docName = args.getString("docName");
-        byte[] docContent = ((BytesWritable)args.getObject("docContent")).getBytes();
+        byte[] docContent = ((BytesWritable)args.getObject("docContent")).copyBytes();
         Tuple result = new Tuple();
         result.add(new Text(docName));
         result.add(new BytesWritable(docContent));

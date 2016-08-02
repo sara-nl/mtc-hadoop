@@ -93,7 +93,7 @@ public class RunModuleFunction extends BaseOperation<Tuple> implements Function<
     protected Tuple operate(TupleEntry args) {
         Tuple result = new Tuple();
         String docName = args.getString("docName");
-        byte[] docContent = ((BytesWritable) args.getObject("docContent")).getBytes();
+        byte[] docContent = ((BytesWritable) args.getObject("docContent")).copyBytes();
         boolean docFailed = args.getBoolean("docFailed");
         if (docFailed) {
             logger.info("Skipping pipelineStep: " + pipelineStep.getName() + " for document: " + docName + " because of previous failure...");
