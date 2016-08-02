@@ -1,5 +1,5 @@
 /**
- * Copyright 2014 SURFsara
+ * Copyright 2016 SURFsara
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,8 +26,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.BytesWritable;
 import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.io.SequenceFile.CompressionType;
 import org.apache.hadoop.io.SequenceFile.Writer.Option;
@@ -39,13 +41,13 @@ import org.apache.log4j.Logger;
 /**
  * Accessing HDFS needs to be performed with privileges for a principal (user)
  * enabled. This is an implementation of a PriviligedAction that, as the logged
- * in user, writes NAF documents to one ore more sequence files.
+ * in user, writes files from the local file system to one ore more sequence files.
  * 
  * @author mathijs.kattenberg@surfsara.nl
  */
-public class WriteNewsreaderDocs implements PrivilegedAction<Long> {
+public class WriteFilesAction implements PrivilegedAction<Long> {
 
-	private static final Logger logger = Logger.getLogger(WriteNewsreaderDocs.class);
+	private static final Logger logger = Logger.getLogger(WriteFilesAction.class);
 
 	private File file;
 	private SequenceFile.Writer writer;
@@ -54,7 +56,7 @@ public class WriteNewsreaderDocs implements PrivilegedAction<Long> {
 
 	private Configuration conf;
 
-	public WriteNewsreaderDocs(Configuration conf, String source, String destination, int docsPerFile) throws IOException {
+	public WriteFilesAction(Configuration conf, String source, String destination, int docsPerFile) throws IOException {
 		this.conf = conf;
 		file = new File(source);
 		this.destination = destination;
@@ -67,7 +69,7 @@ public class WriteNewsreaderDocs implements PrivilegedAction<Long> {
 		writer = null;
 		Option optPath = SequenceFile.Writer.file(new Path(path));
 		Option optKey = SequenceFile.Writer.keyClass(Text.class);
-		Option optVal = SequenceFile.Writer.valueClass(Text.class);
+		Option optVal = SequenceFile.Writer.valueClass(BytesWritable.class);
 		Option optCom = SequenceFile.Writer.compression(CompressionType.BLOCK, Codec);
 		writer = SequenceFile.createWriter(conf, optPath, optKey, optVal, optCom);
 	}
@@ -87,7 +89,7 @@ public class WriteNewsreaderDocs implements PrivilegedAction<Long> {
 				}
 				for (File f : files) {
 					String name = f.getName();
-					String content = readContent(f);
+					byte[] content = readContent(f);
 					if (appendDoc(name, content)) {
 						filesAppended++;
 					}
@@ -108,16 +110,8 @@ public class WriteNewsreaderDocs implements PrivilegedAction<Long> {
 		return filesAppended;
 	}
 
-	private String readContent(File f) throws IOException {
-		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f)));
-		StringBuffer buff = new StringBuffer();
-		String line = br.readLine();
-		while (line != null) {
-			buff.append(line + "\n");
-			line = br.readLine();
-		}
-		br.close();
-		return buff.toString();
+	private byte[] readContent(File f) throws IOException {
+		return IOUtils.toByteArray(new FileInputStream(f));
 	}
 
 	private List<File> getFileListing(File dir) throws FileNotFoundException {
@@ -149,9 +143,9 @@ public class WriteNewsreaderDocs implements PrivilegedAction<Long> {
 		return true;
 	}
 
-	private boolean appendDoc(String docName, String docContents) {
+	private boolean appendDoc(String docName, byte[] docContents) {
 		try {
-			writer.append(new Text(docName), new Text(docContents));
+			writer.append(new Text(docName), new BytesWritable(docContents));
 			writer.hflush();
 			return true;
 		} catch (IOException e) {
