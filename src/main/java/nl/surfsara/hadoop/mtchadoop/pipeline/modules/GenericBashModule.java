@@ -52,7 +52,10 @@ public class GenericBashModule extends SubprocessModule {
 
         // Write input to scratch
         InputStream is = new ByteArrayInputStream(getInputDocument());
-        FileOutputStream fos = new FileOutputStream(new File(scratch + "/input/", getDocumentKey()));
+        File iDir = new File(scratch + "/input/");
+        iDir.mkdirs();
+        File iFile = new File(iDir, getDocumentKey());
+        FileOutputStream fos = new FileOutputStream(iFile);
         IOUtils.copyLarge(is, fos);
         fos.flush();
         fos.close();
