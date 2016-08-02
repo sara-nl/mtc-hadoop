@@ -32,6 +32,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -102,6 +103,9 @@ public class WriteFilesAction implements PrivilegedAction<Long> {
                         }
                     }
                 }
+                writer.hflush();
+                writer.hsync();
+                writer.close();
             }
         } catch (Exception e) {
             logger.error(e);
@@ -113,7 +117,6 @@ public class WriteFilesAction implements PrivilegedAction<Long> {
         FileInputStream fis = new FileInputStream(f);
         byte[] result =  IOUtils.toByteArray(fis);
         fis.close();
-        System.out.println("Read bytes from file: " + result.length);
         return result;
     }
 
@@ -149,15 +152,7 @@ public class WriteFilesAction implements PrivilegedAction<Long> {
 
     private boolean appendDoc(String docName, byte[] docContents) {
         try {
-            System.out.println("Appending: " + docContents.length + " bytes");
-            BytesWritable bw = new BytesWritable(docContents);
-            System.out.println("bw: " + bw.getCapacity() + " bytes");
-            System.out.println("doc: " + docName);
-
-            SequenceFileAsBinaryOutputFormat.WritableValueBytes wvaluebytes = new SequenceFileAsBinaryOutputFormat.WritableValueBytes();
-            wvaluebytes.reset(bw);
-            writer.appendRaw(docName.getBytes(), 0, docName.getBytes().length, wvaluebytes);
-            writer.append(new Text(docName), bw);
+            writer.append(new Text(docName), new BytesWritable(docContents));
             writer.hflush();
             return true;
         } catch (IOException e) {

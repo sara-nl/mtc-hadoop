@@ -30,6 +30,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.security.PrivilegedAction;
 
 /**
@@ -64,19 +65,13 @@ public class ReadFilesAction implements PrivilegedAction<Long> {
                 FileStatus[] globStatus = fileSystem.globStatus(sPath);
                 for (FileStatus fss : globStatus) {
                     if (fss.isFile()) {
-                        System.out.println("reading " + fss.getPath().getName());
                         Option optPath = SequenceFile.Reader.file(fss.getPath());
                         SequenceFile.Reader r = new SequenceFile.Reader(conf, optPath);
 
                         Text key = new Text();
                         BytesWritable val = new BytesWritable();
 
-                        DataOutputBuffer rawKey = new DataOutputBuffer();
-                        SequenceFile.ValueBytes rawValue = r.createValueBytes();
-
-                        System.out.println(r.nextRaw(rawKey, rawValue));
                         while (r.next(key, val)) {
-                            System.out.println("test: " + key);
                             File outputFile = new File(destDir, key.toString());
                             FileOutputStream fos = new FileOutputStream(outputFile);
                             InputStream is = new ByteArrayInputStream(val.copyBytes());
