@@ -1,0 +1,32 @@
+# Package Files #
+/*.jar
+*.war
+*.ear
+*.zip
+*.tar
+*.tar.gz
+
+# Eclipse files
+.classpath
+.project
+
+# Idea files 
+*.iml
+.idea
+
+# Gradle files
+.gradle
+
+# Generated files
+*.class
+bin/
+gen/
+build
+/target
+/.settings/**
+/.project
+/.classpath
+/*components*
+
+# Misc. files
+*.log
