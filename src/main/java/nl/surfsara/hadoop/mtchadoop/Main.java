@@ -1,5 +1,5 @@
 /**
- * Copyright 2014 SURFsara
+ * Copyright 2016 SURFsara
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.surfsara.newsreader;
+package nl.surfsara.hadoop.mtchadoop;
 
 import java.util.Arrays;
 import java.util.StringTokenizer;
@@ -22,13 +22,13 @@ import nl.surfsara.hadoop.mtchadoop.loader.Loader;
 import nl.surfsara.newsreader.pipeline.Pipeline;
 
 /**
- * Main entry point for the newsreader-hadoop tools.
+ * Main entry point for the mtc-hadoop tools.
  * 
  * @author mathijs.kattenberg@surfsara.nl
  */
 public class Main {
 	public enum Tools {
-		LOADER("loader", "Import/Export tool for NAF files on Hadoop."), PIPELINE("pipeline", "Run the newsreader pipeline on Hadoop.");
+		LOADER("loader", "Import/Export tool for files on HDFS."), PIPELINE("pipeline", "Run a pipeline on Hadoop.");
 
 		private final String name;
 		private final String description;
@@ -48,29 +48,7 @@ public class Main {
 	}
 
 	public static void main(String[] args) {
-		String version = Main.class.getPackage().getImplementationVersion();
-		Package[] packages = Package.getPackages();
-		if (version == null) {
-			for (Package p : packages) {
-				if ("nl.surfsara.newsreader".equals(p.getName())) {
-					version = p.getImplementationVersion();
-				}
-
-			}
-		}
-		StringTokenizer st = null;
-		if (version != null) {
-			st = new StringTokenizer(version, "_");
-		} else {
-			st = new StringTokenizer("");
-			version = "undetermined";
-		}
-		if (version != null && st.countTokens() >= 2) {
-			System.out.print("newsreader-hadoop version: " + st.nextToken() + " build " + st.nextToken() + "\n");
-		} else {
-			System.out.print("newsreader-hadoop version: " + version + "\n");
-		}
-
+		System.out.println("mtc-hadoop");
 		int retval = 0;
 		boolean showUsage = false;
 		if (args.length <= 0) {
