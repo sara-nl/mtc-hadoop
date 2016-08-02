@@ -1,0 +1,29 @@
+apply plugin: 'java'
+apply plugin: 'application'
+
+group = "nl.surfsara.hadoop"
+
+mainClassName = "nl.surfsara.hadoop.mtchadoop.Main"
+
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+
+repositories {
+    mavenCentral()
+    jcenter()
+}
+
+dependencies {
+    compile 'org.slf4j:slf4j-api:1.7.13'
+    compile 'org.apache.hadoop:hadoop-client:2.7.1'
+
+    testCompile 'junit:junit:4.12'
+}
+
+startScripts{
+    String scriptText = new File("src/main/resources/unixstartscript.template").text
+    unixStartScriptGenerator.template = resources.text.fromString(scriptText)
+    doLast{
+        delete windowsScript
+    }
+}
