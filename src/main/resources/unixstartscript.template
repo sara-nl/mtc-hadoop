@@ -167,5 +167,5 @@ JARS=\${CLASSPATH//:/,}
 yarn jar \\
     	\$APP_HOME/lib/${applicationName}.jar \\
          ${mainClassName} \\
-    	"\$@" \\
-    	-libjars \$JARS
+    	"\$@"
+

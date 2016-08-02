@@ -9,6 +9,7 @@ sourceCompatibility = 1.7
 targetCompatibility = 1.7
 
 repositories {
+    maven { url 'http://conjars.org/repo' }
     mavenCentral()
     jcenter()
 }
@@ -16,14 +17,30 @@ repositories {
 dependencies {
     compile 'org.slf4j:slf4j-api:1.7.13'
     compile 'org.apache.hadoop:hadoop-client:2.7.1'
+    compile 'cascading:cascading-core:3.1.0'
+    compile 'cascading:cascading-hadoop:3.1.0'
+    compile 'org.json:json:20160212'
 
     testCompile 'junit:junit:4.12'
 }
 
-startScripts{
+
+jar {
+    into('lib'){
+        from configurations.runtime
+    }
+    manifest {
+        attributes(
+                'Main-Class': mainClassName,
+                "Class-Path": configurations.compile.collect { it.getName() }.join(' ')
+        )
+    }
+}
+
+startScripts {
     String scriptText = new File("src/main/resources/unixstartscript.template").text
     unixStartScriptGenerator.template = resources.text.fromString(scriptText)
-    doLast{
+    doLast {
         delete windowsScript
     }
 }

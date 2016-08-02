@@ -21,6 +21,7 @@ import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.BytesWritable;
+import org.apache.hadoop.io.DataOutputBuffer;
 import org.apache.hadoop.io.SequenceFile;
 import org.apache.hadoop.io.SequenceFile.Reader.Option;
 import org.apache.hadoop.io.Text;
@@ -63,16 +64,22 @@ public class ReadFilesAction implements PrivilegedAction<Long> {
                 FileStatus[] globStatus = fileSystem.globStatus(sPath);
                 for (FileStatus fss : globStatus) {
                     if (fss.isFile()) {
+                        System.out.println("reading " + fss.getPath().getName());
                         Option optPath = SequenceFile.Reader.file(fss.getPath());
                         SequenceFile.Reader r = new SequenceFile.Reader(conf, optPath);
 
                         Text key = new Text();
                         BytesWritable val = new BytesWritable();
 
+                        DataOutputBuffer rawKey = new DataOutputBuffer();
+                        SequenceFile.ValueBytes rawValue = r.createValueBytes();
+
+                        System.out.println(r.nextRaw(rawKey, rawValue));
                         while (r.next(key, val)) {
+                            System.out.println("test: " + key);
                             File outputFile = new File(destDir, key.toString());
                             FileOutputStream fos = new FileOutputStream(outputFile);
-                            InputStream is = new ByteArrayInputStream(val.getBytes());
+                            InputStream is = new ByteArrayInputStream(val.copyBytes());
                             IOUtils.copy(is, fos);
                             fos.flush();
                             fos.close();

@@ -1,0 +1,9 @@
+{
+"id":"testing",
+"description":"Test pipeline",
+"version":"1.0",
+"layout":[
+    {"name":"test1", "class":"nl.surfsara.hadoop.mtchadoop.pipeline.modules.GenericBashModule", "timeout":600000, "numErrorLines":4},
+    {"name":"test2", "class":"nl.surfsara.hadoop.mtchadoop.pipeline.modules.GenericBashModule", "timeout":600000, "numErrorLines":4},
+]
+}
