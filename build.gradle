@@ -14,9 +14,13 @@ repositories {
     jcenter()
 }
 
+configurations {
+    providedCompile
+}
+
 dependencies {
     compile 'org.slf4j:slf4j-api:1.7.13'
-    compile 'org.apache.hadoop:hadoop-client:2.7.1'
+    providedCompile 'org.apache.hadoop:hadoop-client:2.7.1'
     compile 'cascading:cascading-core:3.1.0'
     compile 'cascading:cascading-hadoop:3.1.0'
     compile 'org.json:json:20160212'
@@ -24,10 +28,17 @@ dependencies {
     testCompile 'junit:junit:4.12'
 }
 
+compileJava {
+    sourceSets.main.compileClasspath += configurations.providedCompile
+}
+
+run {
+    classpath += configurations.providedCompile
+}
 
 jar {
     into('lib'){
-        from configurations.runtime
+        from configurations.compile
     }
     manifest {
         attributes(
@@ -44,3 +55,11 @@ startScripts {
         delete windowsScript
     }
 }
+
+//distributions {
+//    main {
+//        contents {
+//            from { 'src/main/resources/log4j.properties' }
+//        }
+//    }
+//}
