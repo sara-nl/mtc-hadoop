@@ -83,9 +83,15 @@ public class GenericBashModule extends SubprocessModule {
 
         // Read output file from scratch
         File outputFile = new File(scratch + "/output/", getDocumentKey());
-        FileInputStream fis = new FileInputStream(outputFile);
-        setOutputDocument(IOUtils.toByteArray(fis));
-        fis.close();
+        if (outputFile.exists()) {
+            FileInputStream fis = new FileInputStream(outputFile);
+            setOutputDocument(IOUtils.toByteArray(fis));
+            fis.close();
+        } else {
+            logger.info("Output file does not exist - failing this module.");
+            setFailed(true);
+            setOutputDocument(getInputDocument());
+        }
         return this;
     }
 
