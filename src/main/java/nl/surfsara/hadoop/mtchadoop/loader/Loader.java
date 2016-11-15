@@ -133,7 +133,7 @@ public class Loader implements Runnable {
 
         // TODO supply at run time
         System.setProperty("java.security.krb5.realm", "CUA.SURFSARA.NL");
-        System.setProperty("java.security.krb5.kdc", "kdc.hathi.surfsara.nl");
+        System.setProperty("java.security.krb5.kdc", "kerberos1.osd.surfsara.nl");
 
         UserGroupInformation.setConfiguration(conf);
 
